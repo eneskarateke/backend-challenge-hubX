@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Books = require("./book-model.js");
+const bookMW = require("./book-middleware");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -10,7 +11,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:book_id", async (req, res, next) => {
+router.get("/:book_id", bookMW.isIdExist, async (req, res, next) => {
   const book_id = req.params.book_id;
   try {
     const books = await Books.getByBookId(book_id);
@@ -20,19 +21,9 @@ router.get("/:book_id", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", bookMW.PayloadCheck, async (req, res, next) => {
   try {
-    const { title, price, isbn, language, num_pages, publisher, author_id } =
-      req.body;
-    const payload = {
-      title,
-      price,
-      isbn,
-      language,
-      num_pages,
-      publisher,
-      author_id,
-    };
+    const payload = req.checkedPayload;
 
     const addedBook = await Books.addBook(payload);
     res.status(201).json(addedBook);
@@ -41,19 +32,24 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
-  const bookId = req.params.id;
-  const updates = req.body;
+router.put(
+  "/:book_id",
+  bookMW.isIdExist,
+  bookMW.PayloadCheck,
+  async (req, res) => {
+    const bookId = req.params.book_id;
+    const updates = req.checkedPayload;
 
-  try {
-    const updatedBook = await Books.updateById(bookId, updates);
-    res.json(updatedBook);
-  } catch (error) {
-    res.status(500).json({ error: "Kitap bilgileri güncellenemedi." });
+    try {
+      const updatedBook = await Books.updateById(bookId, updates);
+      res.json(updatedBook);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.delete("/:book_id", async (req, res, next) => {
+router.delete("/:book_id", bookMW.isIdExist, async (req, res, next) => {
   const book_id = req.params.book_id;
 
   try {
@@ -61,8 +57,6 @@ router.delete("/:book_id", async (req, res, next) => {
     if (toBeDeleted) {
       await Books.deleteBook(book_id);
       res.json(toBeDeleted);
-    } else {
-      res.status(404).json({ message: "Book not found" });
     }
   } catch (error) {
     next(error);

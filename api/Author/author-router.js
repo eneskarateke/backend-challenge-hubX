@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Authors = require("./author-model.js");
+const authorMW = require("./author-middleware.js");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -14,49 +15,44 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:author_id", authorMW.isIdExist, async (req, res, next) => {
   try {
-    const author = await Authors.getById(req.params.id);
-
-    if (author) {
-      res.json(author);
-    } else {
-      res.status(404).json({ message: "Author not found" });
-    }
+    const author = await Authors.getById(req.params.author_id);
+    res.json(author);
   } catch (error) {
     next(error);
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", authorMW.PayloadCheck, async (req, res, next) => {
   try {
-    const { name, country, birthdate } = req.body;
-    const payload = {
-      name,
-      country,
-      birthdate,
-    };
+    const checkedPayload = req.checkedPayload;
 
-    const addedAuthor = await Authors.addAuthor(payload);
+    const addedAuthor = await Authors.addAuthor(checkedPayload);
     res.status(201).json(addedAuthor);
   } catch (error) {
     next(error);
   }
 });
 
-router.put("/:id", async (req, res) => {
-  const author_id = req.params.id;
-  const updates = req.body;
+router.put(
+  "/:author_id",
+  authorMW.isIdExist,
+  authorMW.PayloadCheck,
+  async (req, res) => {
+    const author_id = req.params.author_id;
+    const checkedPayload = req.checkedPayload;
 
-  try {
-    const updatedAuthor = await Authors.updateById(author_id, updates);
-    res.json(updatedAuthor);
-  } catch (error) {
-    res.status(500).json({ error: "Yazar bilgileri güncellenemedi." });
+    try {
+      const updatedAuthor = await Authors.updateById(author_id, checkedPayload);
+      res.json(updatedAuthor);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.delete("/:author_id", async (req, res, next) => {
+router.delete("/:author_id", authorMW.isIdExist, async (req, res, next) => {
   const author_id = req.params.author_id;
 
   try {
@@ -64,8 +60,6 @@ router.delete("/:author_id", async (req, res, next) => {
     if (toBeDeleted) {
       await Authors.deleteAuthor(author_id);
       res.json(toBeDeleted);
-    } else {
-      res.status(404).json({ message: "Book not found" });
     }
   } catch (error) {
     next(error);
