@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Authors = require("./author-model.js");
 const authorMW = require("./author-middleware.js");
 
+//To see every author in the database.
 router.get("/", async (req, res, next) => {
   try {
     const authors = await Authors.findAll();
@@ -15,6 +16,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+//To see specific author in the database.
 router.get("/:author_id", authorMW.isIdExist, async (req, res, next) => {
   try {
     const author = await Authors.getById(req.params.author_id);
@@ -24,6 +26,7 @@ router.get("/:author_id", authorMW.isIdExist, async (req, res, next) => {
   }
 });
 
+//For adding an author into the database.
 router.post("/", authorMW.PayloadCheck, async (req, res, next) => {
   try {
     const checkedPayload = req.checkedPayload;
@@ -35,6 +38,7 @@ router.post("/", authorMW.PayloadCheck, async (req, res, next) => {
   }
 });
 
+//Updating an author with given id and request body.
 router.put(
   "/:author_id",
   authorMW.isIdExist,
@@ -52,6 +56,7 @@ router.put(
   }
 );
 
+//Deleting the author with given id from database.
 router.delete("/:author_id", authorMW.isIdExist, async (req, res, next) => {
   const author_id = req.params.author_id;
 

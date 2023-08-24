@@ -2,6 +2,8 @@ const router = require("express").Router();
 const Books = require("./book-model.js");
 const bookMW = require("./book-middleware");
 
+//To see every book in the database.
+
 router.get("/", async (req, res, next) => {
   try {
     const books = await Books.getAll();
@@ -10,6 +12,8 @@ router.get("/", async (req, res, next) => {
     next(error);
   }
 });
+
+//To see specific book in the database.
 
 router.get("/:book_id", bookMW.isIdExist, async (req, res, next) => {
   const book_id = req.params.book_id;
@@ -21,6 +25,8 @@ router.get("/:book_id", bookMW.isIdExist, async (req, res, next) => {
   }
 });
 
+//For adding a book into the database.
+
 router.post("/", bookMW.PayloadCheck, async (req, res, next) => {
   try {
     const payload = req.checkedPayload;
@@ -31,6 +37,8 @@ router.post("/", bookMW.PayloadCheck, async (req, res, next) => {
     next(error);
   }
 });
+
+//Updating a book with given id and request body.
 
 router.put(
   "/:book_id",
@@ -48,6 +56,8 @@ router.put(
     }
   }
 );
+
+//Deleting a book with given id from database.
 
 router.delete("/:book_id", bookMW.isIdExist, async (req, res, next) => {
   const book_id = req.params.book_id;

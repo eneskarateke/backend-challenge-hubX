@@ -8,17 +8,17 @@ exports.up = function (knex) {
       table.increments("author_id").primary();
       table.string("name", 70).notNullable();
       table.string("country", 40).notNullable();
-      table.date("birthdate");
+      table.date("birthdate").notNullable;
     })
 
     .createTable("book", (table) => {
       table.increments("book_id").primary();
       table.string("title", 100).notNullable();
-      table.decimal("price", 10, 2);
-      table.string("isbn");
-      table.string("language");
-      table.integer("num_pages");
-      table.string("publisher");
+      table.decimal("price", 10, 2).notNullable();
+      table.string("isbn").notNullable();
+      table.string("language").notNullable();
+      table.integer("num_pages").notNullable();
+      table.string("publisher").notNullable();
       table
         .integer("author_id")
         .unsigned()
