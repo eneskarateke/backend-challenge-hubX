@@ -6,6 +6,7 @@ beforeAll(async () => {
   await db.migrate.rollback();
   await db.migrate.latest();
 
+  //Jane Smith
   const authorPayload1 = {
     name: "John Doe",
     country: "United States",
@@ -33,14 +34,34 @@ beforeAll(async () => {
     num_pages: 130,
     publisher: "Sample Publisher",
     author_id: authorResponse1.body.author_id,
-    isbn: "9999-999-9999",
+    isbn: "9999-999-9998",
     language: "English",
   };
 
   const bookPayload2 = {
-    title: "Teknoloji Lideri",
+    title: "Teknolsssoji Lideri",
     price: 9.99,
     num_pages: 100,
+    publisher: "Sample Publisher",
+    author_id: authorResponse2.body.author_id,
+    isbn: "9999-999-9998",
+    language: "English",
+  };
+
+  const bookPayload3 = {
+    title: "Konuşmada Uzman",
+    price: 19.99,
+    num_pages: 130,
+    publisher: "Sample Publisher",
+    author_id: authorResponse1.body.author_id,
+    isbn: "9999-999-9998",
+    language: "English",
+  };
+
+  const bookPayload4 = {
+    title: "hehehe Uzman",
+    price: 19.99,
+    num_pages: 130,
     publisher: "Sample Publisher",
     author_id: authorResponse2.body.author_id,
     isbn: "9999-999-9998",
@@ -50,6 +71,8 @@ beforeAll(async () => {
   await request(server).post("/api/book").send(bookPayload1);
 
   await request(server).post("/api/book").send(bookPayload2);
+  await request(server).post("/api/book").send(bookPayload3);
+  await request(server).post("/api/book").send(bookPayload4);
 });
 
 afterAll(async () => {
@@ -85,7 +108,6 @@ describe("Author and book CRUD Operations", () => {
       .send(updatedAuthorPayload);
 
     expect(response.status).toBe(200);
-    // Additional assertions here
     expect(response.body).toHaveProperty("name", "Jane Smith");
   });
 
@@ -118,12 +140,10 @@ describe("Author and book CRUD Operations", () => {
       .send(updatedBookPayload);
 
     expect(response.status).toBe(200);
-    // Additional assertions here
   });
 
   it("should delete a book", async () => {
     const response = await request(server).delete(`/api/book/1`);
     expect(response.status).toBe(200);
-    // Additional assertions here
   });
 });
