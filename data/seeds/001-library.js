@@ -48,6 +48,7 @@ const defaultAuthors = [
   { name: "Author 2", country: "Country 2", birthdate: "1985-05-15" },
   { name: "Author 3", country: "Country 3", birthdate: "1982-10-20" },
   { name: "Author 4", country: "Country 4", birthdate: "1986-12-10" },
+  { name: "Author 5", country: "Country 5", birthdate: "1986-12-10" },
 ];
 
 exports.seed = async function (knex) {

@@ -30,9 +30,13 @@ const updateById = async (author_id, author) => {
 async function deleteAuthor(author_id) {
   const bookWillBeDeleted = await db("author")
     .where("author_id", author_id)
-    .first();
-
-  await db("book").where("author_id", author_id).del();
+    .del()
+    .then(() => {
+      return db("author")
+        .select("author_id", "name")
+        .where("author_id", author_id)
+        .first();
+    });
 
   return bookWillBeDeleted;
 }

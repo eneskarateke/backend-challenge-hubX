@@ -6,7 +6,6 @@ beforeAll(async () => {
   await db.migrate.rollback();
   await db.migrate.latest();
 
-  //Jane Smith
   const authorPayload1 = {
     name: "John Doe",
     country: "United States",
@@ -27,7 +26,6 @@ beforeAll(async () => {
     .post("/api/author")
     .send(authorPayload2);
 
-  // Create a book
   const bookPayload1 = {
     title: "Sample Book",
     price: 19.99,
@@ -39,7 +37,7 @@ beforeAll(async () => {
   };
 
   const bookPayload2 = {
-    title: "Teknolsssoji Lideri",
+    title: "Teknoloji Lideri",
     price: 9.99,
     num_pages: 100,
     publisher: "Sample Publisher",
@@ -47,7 +45,7 @@ beforeAll(async () => {
     isbn: "9999-999-9998",
     language: "English",
   };
-
+  console.log(authorResponse1.body.author_id);
   const bookPayload3 = {
     title: "Konuşmada Uzman",
     price: 19.99,
@@ -69,7 +67,6 @@ beforeAll(async () => {
   };
 
   await request(server).post("/api/book").send(bookPayload1);
-
   await request(server).post("/api/book").send(bookPayload2);
   await request(server).post("/api/book").send(bookPayload3);
   await request(server).post("/api/book").send(bookPayload4);
@@ -87,13 +84,14 @@ describe("Author and book CRUD Operations", () => {
   it("should get an author list", async () => {
     const response = await request(server).get(`/api/author/`);
     expect(response.status).toBe(200);
-    expect(response.body).toHaveLength(1);
+    expect(response.body).toHaveLength(2);
   });
 
   it("should get an author by ID", async () => {
     const response = await request(server).get(`/api/author/1`);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("author_id", 1);
+    expect(response.body).toHaveProperty("name", "John Doe");
   });
 
   it("should update an author", async () => {
@@ -107,14 +105,8 @@ describe("Author and book CRUD Operations", () => {
       .put(`/api/author/1`)
       .send(updatedAuthorPayload);
 
-    expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("name", "Jane Smith");
-  });
-
-  it("should delete an author", async () => {
-    const response = await request(server).delete(`/api/author/1`);
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("name", "Jane Smith");
   });
 
   it("should get a book by ID", async () => {
@@ -141,9 +133,62 @@ describe("Author and book CRUD Operations", () => {
 
     expect(response.status).toBe(200);
   });
+  it("should delete an author", async () => {
+    const response = await request(server).delete(`/api/author/1`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("name", "Jane Smith");
+  });
+
+  it("after deleting an author, books should be removed related to deleted author", async () => {
+    const response = await request(server).get(`/api/book/`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
+  });
 
   it("should delete a book", async () => {
-    const response = await request(server).delete(`/api/book/1`);
+    const response = await request(server).delete(`/api/book/2`);
     expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("title", "Teknoloji Lideri");
+  });
+
+  it("should delete a book, get book test", async () => {
+    const response = await request(server).get(`/api/book/`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(1);
+  });
+
+  it("should add a book", async () => {
+    const newBookPayload = {
+      title: "New Book",
+      price: 12.99,
+      num_pages: 200,
+      publisher: "New Publisher",
+      author_id: 2,
+      isbn: "9999-999-9999",
+      language: "English",
+    };
+
+    const response = await request(server)
+      .post(`/api/book/`)
+      .send(newBookPayload);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty("title", "New Book");
+  });
+
+  it("should add an Author", async () => {
+    const newAuthorPayload = {
+      name: "New Author",
+      country: "Canada",
+      birthdate: "1985-03-20",
+    };
+
+    const response = await request(server)
+      .post(`/api/author/`)
+      .send(newAuthorPayload);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty("name", "New Author");
+    expect(response.body).toHaveProperty("author_id", 3);
   });
 });
