@@ -8,6 +8,8 @@ Port = 9000,
 
 ## npm run resetdb to reset default database.
 
+## npm run test to start testing.
+
 AUTHOR API
 
 GET LIST OF AUTHORS
