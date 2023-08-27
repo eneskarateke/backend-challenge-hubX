@@ -1,14 +1,24 @@
-Port = 9000,
+# Port = 9000,
 
-## npm install to download dependencies.
+## npm install
 
-## npm run server to start server with nodemon.
+to download dependencies.
 
-## npm start to start server with node.
+## npm run server
 
-## npm run resetdb to reset default database.
+to start server with nodemon.
 
-## npm run test to start testing.
+## npm start
+
+to start server with node.
+
+## npm run resetdb
+
+to reset to default database.
+
+## npm run test
+
+to start testing.
 
 AUTHOR API
 
